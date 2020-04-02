@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+
+<head>
+    <script src="egghunt.js"></script>
+</head>
+
+<body>
+    <center>
+        <div style="font-size: 120px; color:red">
+            YOU FOUND ALL THE EGGS!!
+            <div style="font-size: 80px; color:black">It took you <span id=eggscore></span></div>
+        </div>
+        <div>
+            <p>
+                <button onclick="clearandreturn()">Click here to clear the score and try the demo again.</button>
+            </p>
+        </div>
+    </center>
+
+    <script>
+        // this is just for testing
+        function clearandreturn() {
+            document.cookie = "eehr=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.history.back();
+        }
+    </script>
+</body>
+
+</html>
