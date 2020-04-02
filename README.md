@@ -3,7 +3,7 @@ A simple Javascript file to provide the mechanism for an Easter Egg hunt on your
 In this case, Easter eggs are clickable images (or other clickable elements) that people can search for and collect.
 The code uses a cookie to keep track of what eggs a person has collected and how long it took them to collect all the eggs.
 
-The script has no dependancies.
+The script has no dependancies.\
 Released under the MIT license.
 
 ## Instructions:
