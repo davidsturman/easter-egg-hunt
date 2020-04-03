@@ -9,7 +9,7 @@ Released under the MIT license.
 ## Instructions:
 * The only file you need is egghunt.js. The other files are for demonstrating how it works.
 *  Include egghunt.js on any page on which you put Easter eggs.\
- ```<script src="egghunt.js"></script>``` \
+ ```<script src="egghunt.js"></script>```
  * Set the total number of eggs and the URL for the "success" page
  by calling egghunt.set(number_of_eggs, url).\
  For an example with 10 eggs:\
