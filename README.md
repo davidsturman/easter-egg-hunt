@@ -10,10 +10,15 @@ Released under the MIT license.
 * The only file you need is egghunt.js. The other files are for demonstrating how it works.
 *  Include egghunt.js on any page on which you put Easter eggs.\
  ```<script src="egghunt.js"></script>```
- * Set the total number of eggs and the URL for the "success" page
- by calling egghunt.set(number_of_eggs, url).\
+ * Set the total number of eggs, the URL for the "success" page, and "mode"
+ by calling ```egghunt.set(number_of_eggs, url, mode)```.\
+ Mode is "on", "off", or "test". Default is off.\
+ If "on", eggs are visible (if you used the class="egghunt", see below).\
+ If "off", eggs are invisible - default\
+ If "test", eggs are visible if the URL has a "egghunt" parameter.\
  For an example with 10 eggs:\
- ```<script>egghunt.set(10, "success.html")</script>```
+ ```<script>egghunt.set(10, "success.html", "test")</script>```\
+ Eggs will appear if the url is http://mysite.com/?egghunt
  
 * You can use any clickable element (such as images) for eggs.\
   Give easter eggs class="egghunt" and onclick="egghunt.record(1)"
