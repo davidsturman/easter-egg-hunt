@@ -6,38 +6,50 @@
  * Instructions:
  * - Include this file with <script src="egghunt.js"></script> on any page
  *     on which you put Easter eggs.
+ * - Set the total number of eggs and the URL for the "success" page
+ *   by calling egghunt.set(number_of_eggs, url). For example of 10 eggs:
+ *        <script>egghunt.set(10, "success.html")</script>
+ *
  * - You can use any clickable element (such as images) for eggs.
  * - Give easter eggs class="egghunt" and onclick="egghunt.record(1)"
  *     where the number 1 is replaced with a unique number for
  *     each egg starting at 0. Make sure you don't skip any numbers.
  *     Example:
  *        <img src="egg.png" class="egghunt" onclick="egghunt.record(0)">
- * - Fill in the total number of eggs into "neggs" below
- * - Fill in the URL for the "success" page into "success" below
+ *     Use the class to make eggs invisible before Easter and then visible on Easter.
  *
- * - If you want to display the time it took to find all the eggs
- *     on a "success" page, then create a <div> or a <span> with id="eggscore".
- *     The script will fill that div or span with text like "10 minutes and 3 seconds"
+ * - The code keeps track of how long it took to someone to find all the eggs.
+ *   This is called the score.
+ *   There are several ways to find out someone's score.
+ *   1) The success page will be passed a parameter called SQF_BUNNIES
+ *     (compatible with SquareSpace). It is an encoded version of the number
+ *     of milliseconds it took for the person to find all the eggs.
+ *     Example:
+ *       Your success page will be called with
+ *       http://www.domain.com/success?SQF_BUNNIES=DMTQ1ODkz
+ *     This can be decoded with egghunt.decode().
+ *       egghunt.decode("DMTQ1ODkz") will return 145893 (2 min 26 seconds)
+ *   2) The javascript will automatically put the score in a page element with id="eggscore".
  *     Example:
  *        <div>It took you <span id=eggscore></span></div>
  *     will become
  *        It took you 10 minutes and 3 seconds
  *
- * - Note: Easter Egg scores are kept in an cookie called "eehr".
+ * - Note: Easter eggs and times are kept in an cookie called "eehr".
  *
  */
 
 var egghunt = {
-    // *****************************************************
-    // REPLACE THIS NUMBER WITH THE NUMBER OF EASTER EGGS **
-    neggs: 4,
-    // REPLACE THIS VALUE WITH THE URL FOR THE SUCCESS PAGE
-    success: "success.html",
-    // *****************************************************
-
     egghunt: this,
+    neggs: 4,
+    success: "easter-egg-hunt",
     basetime: 1585526400,
     cookiename: "eehr",
+
+    set: function (neggs, url) {
+        this.neggs = neggs;
+        this.success = url;
+    },
 
     record: function (eggnumber) {
         let eggsfound, start, end, count
@@ -66,7 +78,8 @@ var egghunt = {
                 count++
                 this.cookieEgg(eggsfound, start, now, count)
                 if (eggsfound === alleggs) {
-                    window.location.href = this.success;
+                    window.location.href = this.success + "?SQF_BUNNIES=" +
+                        this.encode(this.msScore());
                 } else {
                     let msg = nice + "<br>";
                     msg += "You now have " + count + " of the " + this.neggs + " eggs.";
@@ -93,8 +106,8 @@ var egghunt = {
     // Read cookies
     // from http://stackoverflow.com/questions/5639346/
     readCookie: function (name) {
-        var c = "";
-        var b = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+        let c = "";
+        let b = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
         if (b) {
             c = b.pop();
             if (typeof c === "undefined") { c = ""; }
@@ -106,21 +119,40 @@ var egghunt = {
         let popup = document.getElementById("EasterPopUp");
         popup.style.display = "block";
         popup.innerHTML = text;
-        console.log(egghunt.getElementHeight(popup));
         setTimeout(function () {
-            console.log(egghunt.getElementHeight(popup));
-            console.log(popup.getBoundingClientRect());
             popup.style.display = "none";
         }, 5000);
     },
 
-    displayScore: function () {
-        let score = "";
-        eehr = this.readCookie(this.cookiename);
+    msScore: function () { // score in milliseconds
+        let score = 0,
+            eehr = this.readCookie(this.cookiename);
         if (eehr.length > 0) {
             let eggsfound, start, end, count;
             [eggsfound, start, end, count] = eehr.split(',');
-            eggsfound = eggsfound / 2;
+            score = end - start
+        }
+        return score;
+    },
+
+    encode: function (score) { // encodes the score with btoa preceded by a random letter
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 24)] + btoa(score);
+    },
+
+    decode: function (score) { // returns the number of milliseconds of the encoded score
+        return atob(score.substr(1));
+    },
+
+    displayScore: function () {
+        let scoreblock = document.getElementById("eggscore"),
+            score = "",
+            eehr = this.readCookie(this.cookiename);
+        if (scoreblock === null) {
+            return "";
+        }
+        if (eehr.length > 0) {
+            let eggsfound, start, end, count;
+            [eggsfound, start, end, count] = eehr.split(',');
             let seconds = Math.round((end - start) / 1000) % 60;
             let minutes = Math.floor((end - start) / 60000);
             if (minutes > 0) {
@@ -151,11 +183,11 @@ var egghunt = {
 document.addEventListener("DOMContentLoaded", startEasterEggHunt);
 function startEasterEggHunt() {
     // add the message overlay to the body
-    var popup = document.createElement("div");
+    let popup = document.createElement("div");
     popup.setAttribute("id", "EasterPopUp");
     document.body.appendChild(popup);
     // dialog box is typically 390px wide and 60px high
-    var style =
+    let style =
         "display:none;" +
         "position:fixed;" +
         "text-align:center;" +
@@ -163,17 +195,16 @@ function startEasterEggHunt() {
         "top:" + ((window.innerHeight - 60) * 0.5) + "px;" +
         "padding:10px;" +
         "background:white;" +
-        "border:2px #7DB83F solid;" +
+        "border:2px rgb(147,113,183) solid;" +
+        "font-family: calluna;" +
         "font-size:30px;" +
         "-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);" +
         "-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);" +
         "box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);" +
+        "z-index: 100;" +
         "";
     popup.setAttribute("style", style);
 
     // look to see if score is needed
-    var scoreblock = document.getElementById("eggscore")
-    if (scoreblock !== null) {
-        egghunt.displayScore();
-    }
+    egghunt.displayScore();
 }
