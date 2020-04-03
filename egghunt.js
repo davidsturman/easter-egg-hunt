@@ -7,7 +7,7 @@
  * - Include this file with <script src="egghunt.js"></script> on any page
  *     on which you put Easter eggs.
  * - Set the total number of eggs and the URL for the "success" page
- *   by calling egghunt.set(number_of_eggs, url). For example of 10 eggs:
+ *   by calling egghunt.set(number_of_eggs, url). For an example with 10 eggs:
  *        <script>egghunt.set(10, "success.html")</script>
  *
  * - You can use any clickable element (such as images) for eggs.
