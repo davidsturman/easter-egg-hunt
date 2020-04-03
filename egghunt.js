@@ -6,9 +6,15 @@
  * Instructions:
  * - Include this file with <script src="egghunt.js"></script> on any page
  *     on which you put Easter eggs.
- * - Set the total number of eggs and the URL for the "success" page
- *   by calling egghunt.set(number_of_eggs, url). For an example with 10 eggs:
- *        <script>egghunt.set(10, "success.html")</script>
+ * - Set the total number of eggs, the URL for the "success" page, and "mode"
+ *   by calling egghunt.set(number_of_eggs, url, mode).
+ *   Mode is "on", "off", or "test". Default is off.
+ *   If "on", eggs are visible (if you used the class="egghunt", see below).
+ *   If "off", eggs are invisible - default
+ *   If "test", eggs are visible if the URL has a "egghunt" parameter.
+ *   For an example with 10 eggs:
+ *        <script>egghunt.set(10, "success.html", "test")</script>
+ *   Eggs will appear if the url is http://mysite.com/?egghunt
  *
  * - You can use any clickable element (such as images) for eggs.
  * - Give easter eggs class="egghunt" and onclick="egghunt.record(1)"
@@ -45,10 +51,12 @@ var egghunt = {
     success: "easter-egg-hunt",
     basetime: 1585526400,
     cookiename: "eehr",
+    mode: "off",
 
-    set: function (neggs, url) {
+    set: function (neggs, url, mode) {
         this.neggs = neggs;
         this.success = url;
+        this.mode = mode;
     },
 
     record: function (eggnumber) {
@@ -204,6 +212,23 @@ function startEasterEggHunt() {
         "z-index: 100;" +
         "";
     popup.setAttribute("style", style);
+
+    // do we display eggs?
+    mode = "none"
+    if (egghunt.mode === "on") {
+        mode = "inline";
+    } else if (egghunt.mode === "test") {
+        const urlParams = new URLSearchParams(window.location.search);
+        if ( urlParams.get("egghunt") !== null) {
+            mode = "inline";
+        } else {
+            mode = "none";
+        }
+    }
+    let eggclass = document.querySelectorAll(".egghunt");
+    eggclass.forEach(function (e) {
+        e.style.display = mode;
+    });
 
     // look to see if score is needed
     egghunt.displayScore();
